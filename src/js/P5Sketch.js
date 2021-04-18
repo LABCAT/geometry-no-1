@@ -5,6 +5,7 @@ import * as p5 from "p5";
 import audio from "../audio/hyperspace-no-1.ogg";
 import cueSet1 from "./cueSet1.js";
 import cueSet2 from "./cueSet2.js";
+import cueSet3 from "./cueSet3.js";
 
 const P5Sketch = () => {
     const sketchRef = useRef();
@@ -29,6 +30,8 @@ const P5Sketch = () => {
 
         p.cueSet2Completed = [];
 
+        p.cueSet3Completed = [];
+
         p.preload = () => {
           p.song = p.loadSound(audio);
         };
@@ -52,6 +55,15 @@ const P5Sketch = () => {
             for (let i = 0; i < cueSet2.length; i++) {
               p.song.addCue(cueSet2[i].time, p.executeCueSet2, i + 1);
             }
+
+            for (let i = 0; i < cueSet3.length; i++) {
+              let vars = {
+                currentCue: i + 1,
+                duration: cueSet3[i].duration,
+              };
+              p.song.addCue(cueSet3[i].time, p.executeCueSet3, vars);
+            }
+
         };
 
         p.draw = () => {
@@ -71,13 +83,33 @@ const P5Sketch = () => {
 
         p.currentShape = 'ellipse';
 
-        p.shapes = ['ellipse', 'octagon', 'rect', 'equilateral', 'hexagon', 'ellipse' ];
+        p.shapes = ['ellipse', 'octagon', 'rect', 'equilateral', 'hexagon', 'hexagon' ];
 
         p.executeCueSet2 = (currentCue) => {
             if (!p.cueSet2Completed.includes(currentCue)) {
                 p.cueSet2Completed.push(currentCue);
                 p.currentShape = p.shapes[currentCue];
             }
+        };
+
+        p.strokeWeightMultiplierSwitch = false;
+
+        p.executeCueSet3 = (vars) => {
+          if (!p.cueSet3Completed.includes(vars.currentCue)) {
+              p.cueSet3Completed.push(vars.currentCue);
+              if(vars.duration > 1){
+                p.strokeWeightMultiplier = 10;
+              }
+              else {
+                if(p.strokeWeightMultiplierSwitch){
+                  p.strokeWeightMultiplier = 1;
+                }
+                else {
+                  p.strokeWeightMultiplier = 4;
+                }
+                p.strokeWeightMultiplierSwitch = !p.strokeWeightMultiplierSwitch;
+              }
+          }
         };
 
         p.C = 0;
